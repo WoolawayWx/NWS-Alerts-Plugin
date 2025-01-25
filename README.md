@@ -1,3 +1,4 @@
+![Title cover of the ticker in work](/supportingAssets/Images/EX3.png)
 # NWS Alerts Plugin
 
 This WordPress plugin provides real-time weather alerts from the National Weather Service (NWS) in the form of a colored ticker bar. Uses javascript to fetch the data using the [National Weather Service API](https://www.weather.gov/documentation/services-web-api), free of charge, but due to the amount of use, the request are limited. 
@@ -31,7 +32,7 @@ Here is an example of how to use the plugin:
 7. Add a shortcode field into the location where you want it, and use `[nws_alerts_plugin]` to implement the ticker. Fonts *should* update with the sites theme. ![Image showing the shortcode.](/supportingAssets/Images/image.png)
 8. Save your page.  
 
-The plugin will now fetch and display real-time weather alerts on your site. If the site is static, like in a police or fire station, it will get updated info *every 5 minutes* in order to keep a light load on servers. 
+The plugin will now fetch and display real-time weather alerts on your site. If the site is static, like in a police or fire station, it will get updated info **every five (5) minutes** in order to keep a light load on servers. 
 
 ## Configuration
 
