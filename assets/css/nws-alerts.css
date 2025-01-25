@@ -1,0 +1,33 @@
+.nws-alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+}
+
+.nws-alert h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.nws-alert .additional-details {
+    display: none;
+    margin-top: 10px;
+}
+
+.nws-alert .toggle-details {
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.nws-alert .toggle-details:hover {
+    background-color: #005177;
+}
