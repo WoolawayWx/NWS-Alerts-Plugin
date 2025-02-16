@@ -1,6 +1,6 @@
 {
-  "name": "0.2.0.0-update-times",
-  "version": "1.0.0",
+  "name": "nws-alert-block",
+  "version": "0.2.1",
   "description": "![Title cover of the ticker in work](/supportingAssets/Images/EX3.png)\r # NWS Alerts Plugin",
   "main": "index.js",
   "scripts": {
