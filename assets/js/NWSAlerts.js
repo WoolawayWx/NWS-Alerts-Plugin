@@ -1,17 +1,9 @@
 (function ($) {
     $(document).ready(function () {
         function fetchAndUpdateAlerts() {
-            console.log('Plugin loaded with data:', nwsPluginData);
-
-            // Parse the countyZones JSON string into an object
             var countyZonesObject = JSON.parse(nwsPluginData.countyZones);
             console.log('County Zones Object:', countyZonesObject);
-
-            // Convert the object keys to an array
             var countyZonesArray = Object.keys(countyZonesObject);
-            console.log('County Zones Array:', countyZonesArray);
-
-            // Fetch colors data from colors.json
             var colorsUrl = nwsPluginData.pluginUrl + 'assets/json/colors.json';
             var colorsData = {};
             var customColors = JSON.parse(nwsPluginData.customColors || '{}');
@@ -20,7 +12,6 @@
                 .then(response => response.json())
                 .then(data => {
                     colorsData = data;
-                    console.log('Colors data:', colorsData);
 
                     // Fetch data from the NWS API for each county zone
                     var allAlerts = [];
@@ -29,7 +20,6 @@
                         return fetch(apiUrl)
                             .then(response => response.json())
                             .then(data => {
-                                console.log(`Data for zone ${zone}:`, data);
                                 if (data.features && data.features.length > 0) {
                                     data.features.forEach(function (alert) {
                                         alert.countyName = countyZonesObject[zone];
@@ -56,11 +46,11 @@
                                 var textColor = customColors[alertType]?.text || colorsData[alertType]?.text || 'black';
                                 var alertHtml = `
                                     <div class="nws-alert" style="background-color: ${backgroundColor}; color: ${textColor}; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-                                        <h3><strong>${alert.countyName}: </strong>${alert.properties.event} from ${new Date(alert.properties.effective).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} till ${new Date(alert.properties.expires).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} by ${alert.properties.senderName}</h3>
+                                        <h3><strong>${alert.countyName}: </strong>${alert.properties.event} from ${new Date(alert.properties.onset).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} till ${new Date(alert.properties.ends).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} by ${alert.properties.senderName}</h3>
                                         <div class="additional-details" style="display: none;">
                                             <p>${alert.properties.description || 'No description available.'}</p>
-                                            <p><strong>Effective:</strong> ${new Date(alert.properties.effective).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                                            <p><strong>Expires:</strong> ${new Date(alert.properties.expires).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p><strong>Effective:</strong> ${new Date(alert.properties.onset).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p><strong>Expires:</strong> ${new Date(alert.properties.ends).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                                             <p><strong>Instructions:</strong> ${alert.properties.instruction || 'No instructions available.'}</p>
                                             <p><strong>Severity:</strong> ${alert.properties.severity}</p>
                                             <p><strong>Certainty:</strong> ${alert.properties.certainty}</p>
@@ -69,20 +59,19 @@
                                         
                                     </div>
                                 `;
-                                var buttonHtml = `<button class="toggle-details" style="white-space: nowrap;">Show Details</button>`;
+                                var buttonHtml = `<button class="toggle-details" style="white-space: nowrap;">Show Details</button>`; // Button that toggles additional details, but doesn't format well so is not used.
                                 container.html(alertHtml);
 
-                                // Add click event to toggle additional details
-                                $('.toggle-details').on('click', function () {
+                                $('.toggle-details').on('click', function () { // Script to show and hide additional details when button is clicked.
                                     var details = $(this).siblings('.additional-details');
                                     if (details.is(':visible')) {
                                         details.hide();
                                         $(this).text('Show Details');
-                                        rotateInterval = setInterval(rotateAlerts, 10000); // Restart rotation
+                                        rotateInterval = setInterval(rotateAlerts, 10000);
                                     } else {
                                         details.show();
                                         $(this).text('Hide Details');
-                                        clearInterval(rotateInterval); // Stop rotation
+                                        clearInterval(rotateInterval);
                                     }
                                 });
                             }
@@ -91,11 +80,8 @@
                                 showAlert(currentIndex);
                                 currentIndex = (currentIndex + 1) % allAlerts.length;
                             }
-
-                            // Show the first alert immediately
                             rotateAlerts();
 
-                            // Rotate alerts every 10 seconds
                             var rotateInterval = setInterval(rotateAlerts, 10000);
                         } else {
                             $('#nws-alerts-plugin-container').empty();
@@ -107,8 +93,6 @@
                     $('#nws-alerts-plugin-container').empty();
                 });
         }
-
-        // Initial fetch and update
         fetchAndUpdateAlerts();
 
         // Update alerts every 5 minutes
