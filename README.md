@@ -4,7 +4,7 @@
 This WordPress plugin provides real-time weather alerts from the National Weather Service (NWS) in the form of a colored ticker bar. Uses javascript to fetch the data using the [National Weather Service API](https://www.weather.gov/documentation/services-web-api), free of charge, but due to the amount of use, the request are limited. 
 
 ## Release
-#### Current Version: *v0.1.0.0 - Pre-Release*
+#### Current Version: *v0.2.0.0 - Pre-Release*
 #### [View Releases](https://github.com/WoolawayWx/NWS-Alerts-Plugin/releases)
 The plan is to get versions into WordPress Plugins Page, but taking it one step at a time. Pre-release versions will only be available on the GitHub. Only larger, stable releases will be submitted to WP.
 ## Features

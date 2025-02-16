@@ -2,33 +2,20 @@
 /*
 Plugin Name: NWS Alerts Plugin
 Description: Add NWS Alerts to your website using NWS API.
-Version: 0.1
+Version: 0.2.0.0
 Author: Cade Woolaway / Central Crossing FPD
 License: GPL2
+Plugin URI: https://github.com/WoolawayWx/NWS-Alerts-Plugin
 */
 
-// Ensure this file is included in a WordPress environment
-if (!function_exists('add_action')) {
-    exit;
-}
-
-// Prevent direct access to the file
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Define constants for the plugin
-if (!defined('NWS_ALERTS_PLUGIN_DIR')) {
-    define('NWS_ALERTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
-}
+define('NWS_ALERTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('NWS_ALERTS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-if (!defined('NWS_ALERTS_PLUGIN_URL')) {
-    define('NWS_ALERTS_PLUGIN_URL', plugin_dir_url(__FILE__));
-}
-
-// Enqueue scripts and styles
 function nws_alerts_plugin_enqueue_scripts() {
-    // Register the JavaScript file
     wp_register_script(
         'nws-alerts-plugin-script', 
         NWS_ALERTS_PLUGIN_URL . 'assets/js/NWSAlerts.js', 
@@ -36,17 +23,13 @@ function nws_alerts_plugin_enqueue_scripts() {
         '1.0', 
         true
     );
-
-    // Enqueue the script
     wp_enqueue_script('nws-alerts-plugin-script');
     
     wp_enqueue_style('nws-alerts-plugin-style', NWS_ALERTS_PLUGIN_URL . 'assets/css/nws-alerts.css');
 
-    // Get the county zones from the plugin settings
     $options = get_option('nws_alerts_plugin_settings');
     $county_zones = isset($options['nws_alerts_plugin_county_zones']) ? $options['nws_alerts_plugin_county_zones'] : '';
 
-    // Localize a variable for use in the JS file
     wp_localize_script('nws-alerts-plugin-script', 'nwsPluginData', array(
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'pluginUrl' => NWS_ALERTS_PLUGIN_URL,
@@ -55,25 +38,22 @@ function nws_alerts_plugin_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'nws_alerts_plugin_enqueue_scripts');
 
-// Add a shortcode as an example
 function nws_alerts_plugin_shortcode() {
     return '<div id="nws-alerts-plugin-container"></div>';
 }
 add_shortcode('nws_alerts_plugin', 'nws_alerts_plugin_shortcode');
 
-// Add admin menu
 function nws_alerts_plugin_add_admin_menu() {
     add_menu_page(
-        'NWS Alerts Settings', // Page title
-        'NWS Alerts', // Menu title
-        'manage_options', // Capability
-        'nws-alerts-plugin', // Menu slug
-        'nws_alerts_plugin_settings_page' // Callback function
+        'NWS Alerts Settings', 
+        'NWS Alerts', 
+        'manage_options', 
+        'nws-alerts-plugin', 
+        'nws_alerts_plugin_settings_page' 
     );
 }
 add_action('admin_menu', 'nws_alerts_plugin_add_admin_menu');
 
-// Register settings
 function nws_alerts_plugin_register_settings() {
     register_setting('nws_alerts_plugin_settings_group', 'nws_alerts_plugin_settings');
 
@@ -221,7 +201,37 @@ function nws_alerts_plugin_custom_colors_callback() {
     <?php
 }
 
-// Settings page callback
+function nws_alerts_plugin_register_block() {
+    wp_register_script(
+        'nws-alerts-block-js',
+        plugins_url('blocks/build/index.js', __FILE__),
+        array('wp-blocks', 'wp-editor', 'wp-components', 'wp-element'),
+        filemtime(plugin_dir_path(__FILE__) . 'blocks/build/index.js')
+    );
+
+    register_block_type('nws-alerts-plugin/nws-alerts-block', array(
+        'editor_script' => 'nws-alerts-block-js',
+    ));
+}
+add_action('init', 'nws_alerts_plugin_register_block');
+
+function nws_alerts_enqueue_scripts() {
+    wp_enqueue_script(
+        'nws-alerts-frontend',
+        plugin_dir_url(__FILE__) . 'blocks/build/index.js',
+        array('wp-element', 'jquery'),
+        filemtime(plugin_dir_path(__FILE__) . 'blocks/build/index.js'),
+        true
+    );
+
+    wp_localize_script('nws-alerts-frontend', 'nwsPluginData', array(
+        'countyZones' => json_encode(get_option('nws_plugin_county_zones', '{}')),
+        'customColors' => json_encode(get_option('nws_plugin_custom_colors', '{}')),
+        'pluginUrl' => plugin_dir_url(__FILE__)
+    ));
+}
+add_action('wp_enqueue_scripts', 'nws_alerts_enqueue_scripts');
+
 function nws_alerts_plugin_settings_page() {
     ?>
     <div class="wrap">
