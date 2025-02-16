@@ -1,18 +1,19 @@
 (function ($) {
     $(document).ready(function () {
         function fetchAndUpdateAlerts() {
-            var countyZonesObject = JSON.parse(nwsPluginData.countyZones);
+            console.log(nwsPluginData);
+            var countyZonesObject = nwsPluginData.countyZones;
             console.log('County Zones Object:', countyZonesObject);
             var countyZonesArray = Object.keys(countyZonesObject);
             var colorsUrl = nwsPluginData.pluginUrl + 'assets/json/colors.json';
             var colorsData = {};
-            var customColors = JSON.parse(nwsPluginData.customColors || '{}');
+            var customColors = nwsPluginData.customColors || '{}';
 
             fetch(colorsUrl)
                 .then(response => response.json())
                 .then(data => {
                     colorsData = data;
-
+                    console.log('Colors Data:', colorsData);
                     // Fetch data from the NWS API for each county zone
                     var allAlerts = [];
                     var fetchPromises = countyZonesArray.map(function (zone) {

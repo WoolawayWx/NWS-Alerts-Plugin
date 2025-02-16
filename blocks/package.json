@@ -14,5 +14,10 @@
   "devDependencies": {
     "@wordpress/babel-preset-default": "^8.18.0",
     "@wordpress/scripts": "^30.11.0"
+  },
+  "dependencies": {
+    "@wordpress/block-editor": "^14.13.0",
+    "@wordpress/blocks": "^14.7.0",
+    "@wordpress/element": "^6.18.0"
   }
 }

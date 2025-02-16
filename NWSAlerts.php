@@ -205,8 +205,9 @@ function nws_alerts_plugin_register_block() {
     wp_register_script(
         'nws-alerts-block-js',
         plugins_url('blocks/build/index.js', __FILE__),
-        array('wp-blocks', 'wp-editor', 'wp-components', 'wp-element'),
-        filemtime(plugin_dir_path(__FILE__) . 'blocks/build/index.js')
+        array('wp-blocks', 'wp-editor', 'wp-components', 'wp-element', 'wp-i18n'),
+        filemtime(plugin_dir_path(__FILE__) . 'blocks/build/index.js'),
+        false
     );
 
     register_block_type('nws-alerts-plugin/nws-alerts-block', array(
@@ -214,23 +215,69 @@ function nws_alerts_plugin_register_block() {
     ));
 }
 add_action('init', 'nws_alerts_plugin_register_block');
+function nws_alerts_enqueue_frontend_scripts() {
+    if (!is_admin()) { // Ensure script only loads on frontend
+        wp_enqueue_script(
+            'nws-alerts-frontend',
+            plugin_dir_url(__FILE__) . 'assets/js/NWSAlerts.js',
+            array('jquery'),
+            filemtime(plugin_dir_path(__FILE__) . 'assets/js/NWSAlerts.js'),
+            true
+        );
 
-function nws_alerts_enqueue_scripts() {
+        // Retrieve options from database
+        $options = get_option('nws_alerts_plugin_settings', []);
+        $county_zones = isset($options['nws_alerts_plugin_county_zones']) ? $options['nws_alerts_plugin_county_zones'] : '{}';
+        $custom_colors = isset($options['nws_alerts_plugin_custom_colors']) ? $options['nws_alerts_plugin_custom_colors'] : '{}';
+
+        // Ensure JSON decoding in case values are stored as JSON strings
+        $county_zones = is_array($county_zones) ? $county_zones : json_decode($county_zones, true);
+        $custom_colors = is_array($custom_colors) ? $custom_colors : json_decode($custom_colors, true);
+
+        // Ensure the data is properly formatted as an array
+        if (!is_array($county_zones)) {
+            $county_zones = [];
+        }
+        if (!is_array($custom_colors)) {
+            $custom_colors = [];
+        }
+
+        // Pass properly formatted data to JavaScript
+        wp_localize_script('nws-alerts-frontend', 'nwsPluginData', array(
+            'countyZones' => $county_zones,
+            'customColors' => $custom_colors,
+            'pluginUrl' => plugin_dir_url(__FILE__)
+        ));
+    }
+}
+add_action('wp_enqueue_scripts', 'nws_alerts_enqueue_frontend_scripts');
+
+function nws_alerts_enqueue_editor_assets() {
     wp_enqueue_script(
-        'nws-alerts-frontend',
+        'nws-alerts-block-editor',
         plugin_dir_url(__FILE__) . 'blocks/build/index.js',
-        array('wp-element', 'jquery'),
+        array('wp-blocks', 'wp-editor', 'wp-components', 'wp-element', 'wp-i18n'),
         filemtime(plugin_dir_path(__FILE__) . 'blocks/build/index.js'),
         true
     );
+}
+add_action('enqueue_block_editor_assets', 'nws_alerts_enqueue_editor_assets');
 
-    wp_localize_script('nws-alerts-frontend', 'nwsPluginData', array(
-        'countyZones' => json_encode(get_option('nws_plugin_county_zones', '{}')),
-        'customColors' => json_encode(get_option('nws_plugin_custom_colors', '{}')),
-        'pluginUrl' => plugin_dir_url(__FILE__)
-    ));
+function nws_alerts_enqueue_scripts() {
+    if (is_admin()) {
+        return; // Do not enqueue this script in admin
+    }
+
+    wp_enqueue_script(
+        'nws-alerts-frontend',
+        plugin_dir_url(__FILE__) . 'assets/js/NWSAlerts.js',
+        array('jquery'),
+        filemtime(plugin_dir_path(__FILE__) . 'assets/js/NWSAlerts.js'),
+        true
+    );
 }
 add_action('wp_enqueue_scripts', 'nws_alerts_enqueue_scripts');
+
 
 function nws_alerts_plugin_settings_page() {
     ?>
