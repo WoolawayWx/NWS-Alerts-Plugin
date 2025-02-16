@@ -1,0 +1,18 @@
+{
+  "name": "0.2.0.0-update-times",
+  "version": "1.0.0",
+  "description": "![Title cover of the ticker in work](/supportingAssets/Images/EX3.png)\r # NWS Alerts Plugin",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@wordpress/babel-preset-default": "^8.18.0",
+    "@wordpress/scripts": "^30.11.0"
+  }
+}
